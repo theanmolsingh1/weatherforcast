@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            font-family: 'Poppins', sans-serif;
+        }
+        .weather-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+        }
+        .weather-container:hover {
+            transform: scale(1.205);
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s ease-in-out, transform 0.2s;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        #loading {
+            display: none;
+        }
+
+        .bubbles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: rise 10s infinite ease-in-out;
+        }
+        @keyframes rise {
+            0% { transform: translateY(0); opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-120vh); opacity: 0; }
+        }
+        .bubble:nth-child(1) { width: 20px; height: 20px; left: 10%; animation-duration: 3s; }
+        .bubble:nth-child(2) { width: 30px; height: 30px; left: 25%; animation-duration: 6s; }
+        .bubble:nth-child(3) { width: 40px; height: 40px; left: 50%; animation-duration: 4s; }
+        .bubble:nth-child(4) { width: 25px; height: 25px; left: 75%; animation-duration: 3s; }
+        .bubble:nth-child(5) { width: 15px; height: 15px; left: 90%; animation-duration: 5s; }
+        
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100">
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="weather-container">
+        <h2 class="mb-3">🌦 Weather App</h2>
+        <input type="text" id="city" class="form-control mb-3" placeholder="Enter City:">
+        <button class="btn btn-primary w-100" onclick="getWeather()">Get Weather</button>
+        <div id="loading" class="spinner-border text-primary mt-3" role="status"></div>
+        <div id="weather" class="mt-3"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            let city = document.getElementById("city").value.trim();
+            if (!city) {
+                document.getElementById("weather").innerHTML = `<div class="alert alert-danger">Please enter a city!</div>`;
+                return;
+            }
+
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("weather").innerHTML = "";  
+
+            let apiKey = "b908d1ec155a3b431874dc74224d269b";  
+            let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            try {
+                let response = await fetch(url);
+                let data = await response.json();
+                
+                if (data.cod === 200) {
+                    document.getElementById("weather").innerHTML = `
+                        <div class="card p-3 mt-2">
+                            <h4>🌡 Temp: ${data.main.temp}°C</h4>
+                            <p>☁️ ${data.weather[0].description}</p>
+                            <p>💨 Wind Speed: ${data.wind.speed} m/s</p>
+                            <p>💧 Humidity: ${data.main.humidity}%</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById("weather").innerHTML = `<div class="alert alert-danger">City not found!</div>`;
+                }
+            } catch (error) {
+                document.getElementById("weather").innerHTML = `<div class="alert alert-warning">Error fetching data!</div>`;
+            }
+
+            document.getElementById("loading").style.display = "none";
+        }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
